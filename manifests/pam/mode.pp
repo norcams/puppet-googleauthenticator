@@ -38,6 +38,6 @@ define googleauthenticator::pam::mode(
     group   => 'root',
     mode    => '0644',
     content => template('googleauthenticator/pam-rule.erb'),
-    notify  => Service['ssh'],
+    notify  => Class['ssh::server::service'],
   }
 }
