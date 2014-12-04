@@ -16,9 +16,9 @@ class googleauthenticator::pam::common {
     default         => 'ssh',
   }
 
-  package {'pam-google-authenticator':
-    name => $package,
-  }
+#  package {'pam-google-authenticator':
+#    name => $package,
+#  }
 
   # Setup the three basic PAM modes
   googleauthenticator::pam::mode {
