@@ -17,6 +17,7 @@ define googleauthenticator::pam::redhat(
   $rule = "google-authenticator-${mode}"
 
   $lastauth = '*[type = "auth" or label() = "include" and . = "common-auth"][last()]'
+  $passauth = '*[type = "auth" and module = "password-auth"]'
 
   case $ensure {
     'present': {
@@ -25,6 +26,7 @@ define googleauthenticator::pam::redhat(
         changes => [
           # Purge existing entries
           'rm include[. =~ regexp("google-authenticator.*")]',
+          "rm $passauth",
           "ins include after ${lastauth}",
           "set include[. = ''] '${rule}'",
           ],
