@@ -16,30 +16,37 @@ define googleauthenticator::pam::redhat(
 ) {
   $rule = "google-authenticator-${mode}"
 
-  $lastauth = '*[type = "auth" or label() = "include" and . = "common-auth"][last()]'
-  $passauth = '*[type = "auth" and module = "password-auth"]'
+#  $lastauth = '*[type = "auth" or label() = "include" and . = "common-auth"][last()]'
+#  $passauth = '*[type = "auth" and module = "password-auth"]'
 
   case $ensure {
-    'present': {
-      augeas {"Add google-authenticator to ${name}":
-        context => "/files/etc/pam.d/${name}",
-        changes => [
-          # Purge existing entries
-          'rm include[. =~ regexp("google-authenticator.*")]',
-          "rm $passauth",
-          "ins include after ${lastauth}",
-          "set include[. = ''] '${rule}'",
-          ],
-        require => File["/etc/pam.d/${rule}"],
-        notify  => Class['ssh::server::service'],
+    present: {
+#      augeas {"Add google-authenticator to ${name}":
+#        context => "/files/etc/pam.d/${name}",
+#        changes => [
+#          # Purge existing entries
+#          'rm include[. =~ regexp("google-authenticator.*")]',
+#          "rm $passauth",
+#          "ins include after ${lastauth}",
+#          "set include[. = ''] '${rule}'",
+#          ],
+#        require => File["/etc/pam.d/${rule}"],
+#        notify  => Class['ssh::server::service'],
+#      }
+      pam { "include_${rule}":
+        ensure   => present,
+        service  => 'sshd',
+        type     => 'auth',
+        control  => 'include',
+        position => 'after last',
       }
     }
-    'absent': {
-      augeas {"Purge existing google-authenticator from ${name}":
-        context => "/files/etc/pam.d/${name}",
-        changes => 'rm include[. =~ regexp("google-authenticator.*")]',
-        notify  => Class['ssh::server::service'],
-      }
+    absent: {
+#      augeas {"Purge existing google-authenticator from ${name}":
+#        context => "/files/etc/pam.d/${name}",
+#        changes => 'rm include[. =~ regexp("google-authenticator.*")]',
+#        notify  => Class['ssh::server::service'],
+#      }
     }
     default: { fail("Wrong ensure value ${ensure}") }
   }
