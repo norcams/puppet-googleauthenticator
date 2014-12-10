@@ -38,7 +38,8 @@ define googleauthenticator::pam::redhat(
         service  => 'sshd',
         type     => 'auth',
         control  => 'include',
-        position => 'after last',
+        module   => 'google-authenticator-wheel-only',
+        position => 'after *[type = "auth" or label() = "include" and . = "common-auth"][last()]',
       }
     }
     absent: {
